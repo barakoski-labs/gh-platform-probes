@@ -1,0 +1,28 @@
+name: deployment-identity-probe
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  deployments: write
+jobs:
+  deployment-identity-probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: deployment-identity-probe
+        env:
+          GH_PROBE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: >-
+          python3 probes/deployment-identity-probe.py
+          --repo "$GITHUB_REPOSITORY"
+          --token-env GH_PROBE_TOKEN
+          --environment probe-env-a
+          --out-dir deployment-identity-output
+          --steps 1,4a
+      - name: deployment-identity-probe-upload
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-identity-probe
+          path: deployment-identity-output/*.json
+          if-no-files-found: error

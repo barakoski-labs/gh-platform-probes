@@ -1,0 +1,23 @@
+{
+  "status": "documented, untested",
+  "source_urls": [
+    "https://docs.github.com/en/rest/deployments/deployments?apiVersion=2022-11-28#create-a-deployment",
+    "https://docs.github.com/en/rest/deployments/deployments?apiVersion=2022-11-28#get-a-deployment"
+  ],
+  "note": "Selected expected fields from published deployment response examples; not captured output, not an exhaustive schema, and not used to transform observations. Documentation was not fetched or verified during this offline task.",
+  "expected_fields": {
+    "id": "integer",
+    "node_id": "string",
+    "sha": "string",
+    "ref": "string",
+    "environment": "string",
+    "creator": {"login": "string", "type": "string"},
+    "performed_via_github_app": "object or null",
+    "payload": "deployment payload; compare observed representation",
+    "created_at": "string",
+    "updated_at": "string",
+    "statuses_url": "string",
+    "repository_url": "string",
+    "url": "string"
+  }
+}
