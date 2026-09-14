@@ -1,0 +1,51 @@
+name: Submit review with built-in token
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Pull request number to submit a review on
+        required: true
+      label:
+        description: Label for the recorded result file
+        required: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  submit-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Submit approving review using the built-in token
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ inputs.pr_number }}
+          REPO: ${{ github.repository }}
+        run: |
+          set +e
+          code=$(curl -sS -o body.json -w '%{http_code}' -X POST \
+            -H "Authorization: Bearer $TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            -H "Content-Type: application/json" \
+            -d '{"event":"APPROVE","body":"Approving for platform capability probe."}' \
+            "https://api.github.com/repos/$REPO/pulls/$PR/reviews")
+          echo "http_status=$code"
+          cat body.json
+          python3 - "$code" <<'PY'
+          import json, sys
+          try:
+              body = json.load(open("body.json"))
+          except Exception:
+              body = open("body.json").read()
+          json.dump({"request": {"method": "POST", "url": "/pulls/reviews", "actor": "built-in workflow token"},
+                     "http_status": int(sys.argv[1]), "response_body": body},
+                    open("result.json", "w"), indent=2)
+          PY
+      - name: Upload result
+        uses: actions/upload-artifact@v4
+        with:
+          name: review-result-${{ inputs.label }}
+          path: result.json
