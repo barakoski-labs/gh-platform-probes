@@ -1,1 +1,2 @@
 baseline line 1
+case 1 direct push, control
