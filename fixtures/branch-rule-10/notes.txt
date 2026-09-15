@@ -1,2 +1,3 @@
 baseline line 1
 case 1 direct push, control
+case 3 change proposed through a pull request
